@@ -2,8 +2,8 @@
 
 ![AWS](https://img.shields.io/badge/AWS-232F3E?logo=amazon-aws&logoColor=white)
 ![Terraform](https://img.shields.io/badge/Terraform-7B42BC?logo=terraform&logoColor=white)
-![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?logo=prometheus&logoColor=white)
-![Grafana](https://img.shields.io/badge/Grafana-F46800?logo=grafana&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-blue?logo=kubernetes&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHubActions-232F3E?logo=githubactions&logoColor=white)
 ![Deployment Status](https://img.shields.io/badge/Deployment-Success-brightgreen)
 
 This project involves provisioning a Kubernetes cluster, deploying a containerized application, and setting up a CI/CD pipeline using Infrastructure-as-Code (IaC) and Kubernetes. It demonstrates the full lifecycle of deploying an application in a cloud environment with a focus on automation and scalability.
@@ -25,17 +25,44 @@ Before starting, ensure you have the following installed and configured:
 ### Step 1: Infrastructure Setup
 
 - Use **Terraform** to provision:
+
   - A Kubernetes cluster (EKS on AWS).
   - Networking basics (VPC, subnets, IAM roles).
+
+  ![snapshot](./evidence/)
+
 - Retrieve and store credentials for kubectl authentication using the command `aws eks update-kubeconfig --region <your-region> --name my-eks-cluster`.
+- Map my IAM user ARN to kubernetes system:masters group for full admin access using the command
+
+  ```bash
+  aws eks create-access-entry --cluster-name kube-foundry-main_eks-cluster --principal-arn arn:aws:iam::<ACCOUNT_ID>:user/<user-name> --type STANDARD --region eu-west-2
+
+  aws eks associate-access-policy --cluster-name kube-foundry-main_eks-cluster --principal-arn arn:aws:iam::<ACCOUNT_ID>:user/<user-name> --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy --access-scope type=cluster --region eu-west-2
+  ```
+
 - Confirm cluster access with `kubectl get nodes`.
+
+  ![snapshot](./evidence/)
 
 ### Step 2: Application Deployment
 
-- Deploy a sample containerized app (e.g., Nginx or a simple Node.js “Hello World”).
-- Create a Kubernetes **Deployment** and **Service**.
+- Deploy the sample containerized app **dwellingbloom** [Dockerfile](./Dockerfile).
+- Create a Kubernetes [Deployment](./kubernetes//deployment.yml) and [Service](./kubernetes/service.yml).
+
+  ```bash
+  kubectl apply -f kubernetes/deployment.yml
+  kubectl get pods
+  kubectl apply -f kubernetes/service.yml
+  kubectl get svc webapp
+  ```
+
 - Expose the app externally (LoadBalancer or NodePort).
-- Verify accessibility (curl or browser).
+
+  ![snapshot](./evidence/)
+
+- Verify accessibility via the browser as shown below.
+
+  ![snapshot](./evidence/)
 
 ### Step 3: Git Workflow
 
@@ -59,25 +86,16 @@ Before starting, ensure you have the following installed and configured:
 
 ---
 
-## 📦 Deliverables
+## Clean up
 
-At the end of the exercise, please provide:
+- Remove deployment and service
 
-- Terraform/OpenTofu code.
-- Kubernetes manifests.
-- Git repository link (with commit history).
-- CI/CD pipeline configuration file.
-- Short README with setup steps and usage instructions.
+  ```bash
+  kubectl delete deployment webapp-deployment
 
----
+  kubectl delete service webapp-service
+  ```
 
-## ✅ Evaluation Criteria
-
-- **Correctness:** Infrastructure and app deploy successfully.
-- **IaC Quality:** Terraform code is modular and reusable.
-- **Kubernetes Knowledge:** Proper use of deployments, services, namespaces.
-- **Git Workflow:** Clear commit history and branching strategy.
-- **CI/CD:** Pipeline runs successfully and automates deployment.
-- **Bonus:** Docker/GitOps integration.
+- Destroy infrastructure using the command `terraform destroy`
 
 ---
