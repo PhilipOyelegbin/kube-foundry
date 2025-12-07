@@ -1,0 +1,14 @@
+.github/
+.terraform/
+./kubernetes/
+./modules/
+.gitignore
+.terraform.lock.hcl
+Dockerfile
+*.tf
+*.tfstate
+*.tfstate.backup
+*.tfvars
+*.md
+./dwellingbloom/.gitignore
+./dwellingbloom/netlify.toml
