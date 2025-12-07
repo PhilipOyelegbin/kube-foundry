@@ -16,13 +16,13 @@ data "aws_availability_zones" "available" {
 }
 
 resource "aws_subnet" "pub_subnets" {
-  count             = 2
-  vpc_id            = aws_vpc.main_vpc.id
-  cidr_block        = var.subnets_cidr[count.index]
-  availability_zone = element(data.aws_availability_zones.available.names, count.index)
+  count                   = 2
+  vpc_id                  = aws_vpc.main_vpc.id
+  cidr_block              = var.subnets_cidr[count.index]
+  availability_zone       = element(data.aws_availability_zones.available.names, count.index)
   map_public_ip_on_launch = true
-  enable_dns64 = true
-  
+  enable_dns64            = true
+
   tags = {
     Name = "${var.project_name}-pub_subnet_${count.index + 1}"
   }
